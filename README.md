@@ -1,42 +1,52 @@
 # Indonesia GDP Growth Analysis
 
-This project analyzes Indonesia's annual GDP growth using a small macroeconomic time-series dataset built from public indicator files. The workflow moves from raw data formatting, to missing-value treatment, to feature engineering, to regression-based forecasting and scenario analysis.
-
-The core project questions are:
-
-1. Which macroeconomic indicators move most closely with Indonesia's GDP growth?
-2. Can a simple, interpretable regression pipeline forecast GDP growth from prior-year conditions?
-3. What combinations of macro improvements are associated with a path toward 6% GDP growth by 2027?
+This project studies Indonesia's GDP growth using annual macroeconomic data and an interpretable regression pipeline. The goal is to understand which indicators matter most, forecast GDP growth from prior-year conditions, and test what kind of macroeconomic improvements are associated with a path toward 6% growth.
 
 ![Indonesia GDP Growth](visualisation/indonesia_gdp_growth.png)
 
-## Repository Layout
+## Problem Breakdown
 
-- `raw_data/`: source CSV files plus the raw data formatting notebook.
-- `data_cleaning.ipynb`: imputes missing values, standardizes columns, and creates the lagged modelling dataset.
-- `feature_engineering.ipynb`: creates derived macro features and exports the reduced modelling table.
-- `modelling.ipynb`: benchmarks linear models and saves the final trained pipeline as `gdp_lasso_model.pkl`.
-- `analysis.ipynb`: descriptive analysis, correlation review, 2026 forecast, and prescriptive scenario testing.
-- `visualisation/`: exported charts used to summarize the analysis.
+The project is built around four questions:
 
-## Data Pipeline
+1. How has Indonesia's GDP growth behaved historically?
+2. Which macroeconomic indicators move most closely with GDP growth?
+3. Can GDP growth be predicted from lagged macroeconomic conditions?
+4. What changes in key indicators are associated with higher-growth scenarios?
 
-The notebooks are intended to be read in this order:
+## Working Steps
 
 1. `raw_data/data_formatting.ipynb`
-   Builds the base Indonesia dataset by extracting and merging annual indicator series.
+   Extract Indonesia-specific data from multiple raw files and merge everything into one annual dataset.
 2. `data_cleaning.ipynb`
-   Repairs missing values with interpolation and regression-based imputation, then creates lagged features.
+   Repair missing values with interpolation and regression-based imputation, standardize labels, and create lagged features.
 3. `feature_engineering.ipynb`
-   Engineers features such as `real_interest_rate`, `exchange_rate_change_lag1`, and `export_import_ratio`.
+   Build derived features such as `real_interest_rate`, `exchange_rate_change_lag1`, and `export_import_ratio`, then reduce the feature set.
 4. `modelling.ipynb`
-   Compares `LinearRegression`, `Lasso`, and `Ridge`, then packages the best workflow into a reusable pipeline.
+   Compare linear regression, Lasso, and Ridge models, then save the best pipeline.
 5. `analysis.ipynb`
-   Uses the cleaned data and trained model for historical interpretation, forecasting, and what-if scenarios.
+   Use the cleaned data and trained model for descriptive insights, prediction, and scenario analysis.
 
-## Main Inputs
+## Model Behavior
 
-The merged dataset combines GDP growth with macro indicators such as:
+The model is designed to be interpretable rather than complex. Instead of using black-box methods, the project relies on regularized linear models so the effect of each feature remains readable.
+
+The modelling workflow behaves as follows:
+
+- it starts from prior-year macroeconomic variables rather than same-year future information
+- it engineers a few compact signals, such as trade balance and real interest pressure
+- it scales the inputs to keep coefficients comparable
+- it applies regularization to reduce overfitting in a small time-series dataset
+
+In the model comparison notebook:
+
+- Lasso performs best for the next-year GDP growth setup
+- Ridge performs best for the current-year GDP growth setup
+
+This means the final forecasting logic favors simple linear structure with coefficient shrinkage, not a highly flexible nonlinear model.
+
+## Inputs
+
+The dataset combines GDP growth with annual macroeconomic indicators, including:
 
 - household consumption
 - unemployment rate
@@ -47,27 +57,34 @@ The merged dataset combines GDP growth with macro indicators such as:
 - tax revenue
 - state revenue
 - gross capital formation growth
-- import and export values
+- imports and exports
 - IDR/USD exchange rate
 
-## Main Outputs
+## Outputs
 
-- `formatted_gdp_growth_data.csv`: merged annual dataset before cleaning.
-- `cleaned_gdp_growth_lag1.csv`: cleaned lagged dataset used for modelling.
-- `feature_engineered_gdp_growth_lag1.csv`: reduced feature set after feature engineering and selection.
-- `gdp_lasso_model.pkl`: trained forecasting pipeline saved from the modelling notebook.
+The main outputs of the project are:
 
-## Modelling Approach
+- `formatted_gdp_growth_data.csv`: merged annual dataset before cleaning
+- `cleaned_gdp_growth_lag1.csv`: cleaned lagged dataset for modelling
+- `feature_engineered_gdp_growth_lag1.csv`: reduced feature set after engineering and selection
+- `gdp_lasso_model.pkl`: saved trained forecasting pipeline
+- `visualisation/`: charts for descriptive, correlation, and modelling results
 
-The project uses regularized linear models instead of heavier black-box models because the dataset is small and the goal is interpretability. The final workflow performs feature engineering inside a scikit-learn pipeline, scales the inputs, and fits a regression model to predict GDP growth from prior-year macro conditions.
+The analysis notebook also produces:
 
-## Public Notebook Notes
+- historical GDP growth visualizations
+- correlation-based feature insights
+- a forward GDP growth prediction
+- moderate and aggressive scenario analyses for reaching higher growth
 
-The notebooks in this repo have been cleaned for documentation use:
+## Repository Map
 
-- markdown now explains what each section is doing and why it matters
-- low-value inspection cells were removed
-- code comments were rewritten for readability without changing the underlying logic
+- `raw_data/`: source CSV files and raw formatting notebook
+- `data_cleaning.ipynb`: cleaning and imputation
+- `feature_engineering.ipynb`: derived features and selection
+- `modelling.ipynb`: model comparison and pipeline export
+- `analysis.ipynb`: insights, forecast, and scenarios
+- `visualisation/`: exported plots
 
 ## Author
 
